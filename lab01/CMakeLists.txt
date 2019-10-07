@@ -4,39 +4,39 @@ project(lab01)
 set(CMAKE_CXX_STANDARD 17)
 
 add_compile_options(
-        -Werror
+	-Werror
 
-        -Wall
-        -Wextra
-        -Wpedantic
+	-Wall
+	-Wextra
+	-Wpedantic
 
-        -Wcast-align
-        -Wcast-qual
-        -Wconversion
-        -Wctor-dtor-privacy
-        -Wenum-compare
-        -Wfloat-equal
-        -Wnon-virtual-dtor
-        -Wold-style-cast
-        -Woverloaded-virtual
-        -Wredundant-decls
-        -Wsign-conversion
-        -Wsign-promo
+	-Wcast-align
+	-Wcast-qual
+	-Wconversion
+	-Wctor-dtor-privacy
+	-Wenum-compare
+	-Wfloat-equal
+	-Wnon-virtual-dtor
+	-Wold-style-cast
+	-Woverloaded-virtual
+	-Wredundant-decls
+	-Wsign-conversion
+	-Wsign-promo
 )
 
 set(
-        SOURCES
-        main.cpp
-        levenshtein/detail.cpp
-        levenshtein/levenshtein_damerau.cpp
-        levenshtein/levenshtein_matrix.cpp
-        levenshtein/levenshtein_recursive.cpp
+	SOURCES
+	levenshtein/detail.cpp
+	levenshtein/levenshtein_damerau.cpp
+	levenshtein/levenshtein_matrix.cpp
+	levenshtein/levenshtein_recursive.cpp
 )
 
 set(
-        HEADERS
-        levenshtein/levenshtein.hpp
-        levenshtein/detail.hpp
+	HEADERS
+	levenshtein/levenshtein.hpp
+	levenshtein/detail.hpp
 )
 
-add_executable(lab01 ${SOURCES} ${HEADERS})
+add_executable(levenshtein main.cpp ${SOURCES} ${HEADERS})
+add_executable(test        test.cpp ${SOURCES} ${HEADERS})
