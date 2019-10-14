@@ -1,0 +1,121 @@
+\chapter{Исследовательская часть}
+
+\section{Пример работы}
+
+Демонстрация работы программы приведена на рисунках \ref{img:demo_levenshtein_matrix}---\ref{img:demo_levenshtein_damerau}.
+
+\boximg{59.5mm}{demo_levenshtein_matrix}{Демонстрация работы итеративного алгоритма Левенштейна}
+\boximg{19.95mm}{demo_levenshtein_recursive}{Демонстрация работы рекурсивного алгоритма Левенштейна}
+\boximg{58.2mm}{demo_levenshtein_damerau}{Демонстрация работы алгоритма Дамерау — Левенштейна}
+
+\section{Время выполнения алгоритмов}
+
+Алгоритмы тестировались c помощью функции замера процессорного времени \hyperref[lst:tick]{\texttt{tick}} при количестве повторов 100 для \hyperref[lst:levenshtein_matrix]{\texttt{matrix}} и \hyperref[lst:levenshtein_damerau]{\texttt{damerau}}, 1 — для \hyperref[lst:levenshtein_recursive]{\texttt{recursive}};
+
+Результаты замеров приведены в таблице \ref{tbl:runtime}.
+На рисунках \ref{plt:runtime_matrix_recursive} и \ref{plt:runtime_matrix_damerau} приведены графики зависимостей времени работы алгоритмов от длины строк.
+
+\begin{table}
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			len&         matrix&      recursive&        damerau\\
+			\hline
+			  2&           3704&           1886&           3832\\
+			\hline
+			  3&           6363&           6357&           6227\\
+			\hline  
+			  4&           7448&          25544&           7916\\
+			\hline
+			  5&          10053&         122631&          10655\\
+			\hline
+			  6&          12897&         639463&          14912\\
+			\hline
+			  7&          15593&        3485885&          17359\\
+			\hline
+			  8&          19793&       19246714&          21281\\
+			\hline
+			  9&          23385&      106753397&          25707\\
+			\hline
+			 10&          27234&      589147859&          30324\\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Замер времени}
+	\label{tbl:runtime}
+\end{table}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines = left,
+			xlabel = $len$,
+			ylabel = {$t$},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot[color=blue] table[x index=0, y index=1] {inc/dat/test_matrix.dat};
+			\addplot[color=green] table[x index=0, y index=1] {inc/dat/test_recursive.dat};
+			\addlegendentry{matrix}
+			\addlegendentry{recursive}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма от длины строк (матричная и рекурсивная реализации)}
+	\label{plt:runtime_matrix_recursive}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines = left,
+			xlabel = $len$,
+			ylabel = {$t$},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot[color=red] table[x index=0, y index=1] {inc/dat/test_matrix.dat};
+			\addplot[color=blue] table[x index=0, y index=1] {inc/dat/test_damerau.dat};
+			\addlegendentry{matrix}
+			\addlegendentry{damerau}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма от длины строк (матричные реализации)}
+	\label{plt:runtime_matrix_damerau}
+\end{figure}
+
+\section{Использование памяти}
+
+Алгоритмы Левенштейна и Дамерау — Левенштейна не отличаются друг от друга с точки зрения использования памяти, следовательно, достаточно рассмотреть лишь разницу рекурсивной и матричной реализаций этих алгоритмов.
+
+Максимальная глубина стека вызовов при рекурсивной реализации равна сумме длин входящих строк, соответственно, максимальный расход памяти:
+\[
+(\mathrm{sizeof}(src) + \mathrm{sizeof}(dst)) \cdot (2 \cdot \mathrm{sizeof (std\!::\!string\&)} + 4 \cdot \mathrm{sizeof(size\_t)}),
+\]
+где $\mathrm{sizeof}$ — оператор вычисления размера, $src, dst$ — строки, $\mathrm{size\_t}$ — целочисленный тип, $\mathrm{std\!::\!string\&}$ — тип указателя на строку.
+
+Использование памяти при итеративной реализации теоретически равно
+\[
+\mathrm{sizeof}(src) \cdot \mathrm{sizeof}(dst) \cdot \mathrm{sizeof(size\_t)} + 2\cdot(\mathrm{sizeof (std\!::\!string\&)} + \mathrm{sizeof(size\_t)}).
+\]
+
+Например, при вычислении расстояния Левеншейна для строк длиной 10, при размере типов $\mathrm{size\_t}$ и $\mathrm{std\!::\!string\&}$ 8 байтов получим:
+\begin{itemize}
+	\item для рекурсивной реализации $(10 + 10) \cdot (2\cdot8 + 4\cdot8) = 960$ байтов;
+	\item для матричной реализации $10 \cdot 10 \cdot 8 + 2\cdot(8 + 8) = 832$ байта.
+\end{itemize}
+
+Можно заметить, что для корректной работы алгоритмов матрицу можно не хранить целиком, а использовать только текущую и предыдущую строки. При этом, если менять местами $src$ и $dst$ в случае $\mathrm{sizeof}(src) > \mathrm{sizeof}(dst)$, то тогда расход памяти составит
+\[
+(2\min(\mathrm{sizeof}(src), \mathrm{sizeof}(dst)) + 1) \cdot \mathrm{sizeof(size\_t)} + 2\cdot\mathrm{sizeof (std\!::\!string\&)}.
+\]
+В примере выше для строк длиной 10: $(2(10 + 1)\cdot8 + 2\cdot8) = 192$ байта.
+
+\section*{Вывод}
+
+Рекурсивный алгоритм Левенштейна работает на порядок дольше итеративных реализаций, время его работы увеличивается в геометрической прогрессии. Алгоритм Дамерау — Левенштейна работает немногим дольше алгоритма Левенштейна, т. к. в нём добавлены дополнительные проверки.
+
+Но по расходу памяти итеративные алгоритмы проигрывают рекурсивному: максимальный размер используемой памяти в них растёт как произведение длин строк, в то время как у рекурсивного алгоритма — как сумма длин строк. Однако в итеративных алгоритмах можно добиться ещё меньшего порядка роста, равному минимуму из длин строк, если не использовать всю матрицу целиком.

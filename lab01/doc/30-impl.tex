@@ -1,0 +1,173 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены требования к программному обеспечению, средства реализации и листинги кода.
+
+\section{Требования к ПО}
+
+К программе предъявляется ряд требований:
+\begin{itemize}
+	\item на вход подаётся тип алгоритма (\texttt{matrix}, \texttt{recursive} или \texttt{damerau}) и две строки;
+	\item на выходе — искомое расстояние (для \texttt{matrix} или \texttt{recursive} — Левенштейна , для \texttt{damerau} — Дамерау--Левенштейна);
+	\item при указании ключа \texttt{-v|{-}-verbose} в алгоритмах \texttt{matrix} и \texttt{damerau} необходимо вывести матрицу, в \texttt{recursive} — стек вызовов функции;
+	\item программа не должна аварийно завершаться при некорректном вводе пользователя.
+\end{itemize}
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран высокопроизводительный язык C++, так как я его отлично знаю.
+
+Для замера времени использована функция \ref{lst:tick}: в отличие от встроенной функции таймера она способна считать реальное процессорное время в тиках \cite{Kurnosov}.
+
+\begin{lstlisting}[caption={Функция замера процессорного времени},label={lst:tick},style={cpp}]
+uint64_t tick() {
+	uint64_t d;
+	__asm__ __volatile__("rdtsc": "=A" (d));
+	return d;
+}
+\end{lstlisting}
+\section{Листинг кода}
+
+В листингах \ref{lst:initial_matrix}--\ref{lst:levenshtein_damerau} приведены реализации алгоритмов Левенштейна и Дамерау — Левенштейна.
+
+\begin{lstlisting}[caption={Функция, создающая матрицу с инициализированными первой строкой и первым столбцом},label={lst:initial_matrix},style={cpp}]
+namespace levenshtein {
+inline namespace detail {
+
+using row_t = std::vector<size_t>;
+using matrix_t = std::vector<row_t>;
+
+matrix_t initial_matrix(size_t rows, size_t cols) {
+	matrix_t matrix(rows, row_t(cols));
+	for (size_t j = 1; j < cols; ++j)
+		matrix[0][j] = j;
+	for (size_t i = 1; i < rows; ++i)
+		matrix[i][0] = i;
+	return matrix;
+}
+
+}  // namespace detail
+}  // namespace levenshtein
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Процедура, вычисляющая текущее расстояние},label={lst:set_current_min_distance},style={cpp}]
+namespace levenshtein {
+inline namespace detail {
+
+void set_current_min_distance(matrix_t& matrix, size_t i, size_t j, size_t cost) {
+	matrix[i][j] = std::min({
+		matrix[i][j - 1] + 1,
+		matrix[i - 1][j] + 1,
+		matrix[i - 1][j - 1] + cost
+	});
+}
+
+}  // namespace detail
+}  // namespace levenshtein
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Функция, реализующая матричный алгоритм Левенштейна},label={lst:levenshtein_matrix},style={cpp}]
+namespace levenshtein {
+
+size_t matrix(const std::string& src, const std::string& dst) {
+	if (src.empty()) return dst.size();
+	if (dst.empty()) return src.size();
+
+	auto matrix = initial_matrix(src.size() + 1, dst.size() + 1);
+
+	for (size_t i = 1; i <= src.size(); ++i)
+		for (size_t j = 1; j <= dst.size(); ++j)
+			set_current_min_distance(matrix, i, j, src[i - 1] != dst[j - 1]);
+
+	return matrix.back().back();
+}
+
+}  // namespace levenshtein
+
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Функция, реализующая рекурсивный алгоритм Левенштейна},label={lst:levenshtein_recursive},style={cpp}]
+namespace levenshtein {
+
+size_t recursive(const std::string& src, size_t i, const std::string& dst, size_t j) {
+	if (!i) return j;
+	if (!j) return i;
+
+	const size_t cost = src[i - 1] != dst[j - 1];
+
+	return std::min({
+		recursive(src, i - 1, dst, j) + 1,
+		recursive(src, i, dst, j - 1) + 1,
+		recursive(src, i - 1, dst, j - 1) + cost
+	});
+}
+
+size_t recursive(const std::string& src, const std::string& dst) {
+	return recursive(src, src.size(), dst, dst.size());
+}
+
+}  // namespace levenshtein
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Процедура, инициализирующая вторую строку и второй столбец},label={lst:init_second_layer},style={cpp}]
+namespace levenshtein {
+inline namespace detail {
+
+void init_second_layer(matrix_t& matrix, const std::string& src, const std::string& dst){
+	for (size_t j = 1; j <= dst.size(); ++j)
+		set_current_min_distance(matrix, 1, j, src[0] != dst[j - 1]);
+	for (size_t i = 1; i <= src.size(); ++i)
+		set_current_min_distance(matrix, i, 1, src[i - 1] != dst[0]);
+}
+
+}  // namespace detail
+}  // namespace levenshtein
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Функция, реализующая алгоритм Дамерау — Левенштейна},label={lst:levenshtein_damerau},style={cpp}]
+namespace levenshtein {
+
+size_t damerau(const std::string& src, const std::string& dst) {
+	if (src.empty()) return dst.size();
+	if (dst.empty()) return src.size();
+
+	auto matrix = initial_matrix(src.size() + 1, dst.size() + 1);
+	init_second_layer(matrix, src, dst);
+
+	for (size_t i = 2; i <= src.size(); ++i) {
+		for (size_t j = 2; j <= dst.size(); ++j) {
+			const size_t cost = src[i - 1] != dst[j - 1];
+			set_current_min_distance(matrix, i, j, cost);
+
+			if (src[i - 1] == dst[j - 2] && src[i - 2] == dst[j - 1]) {
+				matrix[i][j] = std::min(matrix[i - 2][j - 2] + cost, matrix[i][j]);
+			}
+		}
+	}
+
+	return matrix.back().back();
+}
+
+}  // namespace levenshtein
+\end{lstlisting}
+
+В листинге \ref{lst:test_levenshtein} приведена реализация функции замера времени работы алгоритмов
+
+\begin{lstlisting}[caption={Функция замера времени работы алгоритмов в тиках},label={lst:test_levenshtein},style={cpp}]
+template <levenshtein::func_type LevenshteinF, size_t N>
+uint64_t test_levenshtein(const std::string& src, const std::string& dst) {
+	const uint64_t tb = tick();
+
+	for (size_t i = 0; i != N; ++i) {
+		LevenshteinF(src, dst, false);
+	}
+
+	const uint64_t te = tick();
+
+	return (te - tb) / N;
+}
+\end{lstlisting}
+
+
+\section*{Вывод}
+
+Правильный выбор инструментов разработки позволил на основе требований к программе эффективно реализовать алгоритмы, настроить модульное тестирование и выполнить исследовательский раздел лабораторной работы.
