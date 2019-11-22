@@ -34,7 +34,6 @@
 \usepackage{listings}
 \usepackage{xcolor}
 
-
 \lstdefinestyle{cpp}{
 	language=C++,
 	backgroundcolor=\color{white},
@@ -63,7 +62,7 @@
 
 \usepackage{graphicx}
 \newcommand{\img}[3] {
-	\begin{figure}[h]
+	\begin{figure}[h!]
 		\center{\includegraphics[height=#1]{inc/img/#2}}
 		\caption{#3}
 		\label{img:#2}
@@ -81,5 +80,7 @@
 
 \usepackage[unicode,pdftex]{hyperref} % Ссылки в pdf
 \hypersetup{hidelinks}
+
+\usepackage{csvsimple}
 
 \newcommand{\code}[1]{\texttt{#1}}

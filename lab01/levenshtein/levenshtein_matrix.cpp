@@ -1,24 +1,11 @@
 #include "levenshtein.hpp"
 
-#include "detail.hpp"
+#include "levenshtein_detail_matrix.hpp"
 
 namespace levenshtein {
 
-size_t matrix(const std::string& src, const std::string& dst, bool verbose = false) {
-	if (src.empty()) return dst.size();
-	if (dst.empty()) return src.size();
-
-	auto matrix = initial_matrix(src.size() + 1, dst.size() + 1);
-
-	for (size_t i = 1; i <= src.size(); ++i)
-		for (size_t j = 1; j <= dst.size(); ++j)
-			set_current_min_distance(matrix, i, j, src[i - 1] != dst[j - 1]);
-
-	if (verbose) {
-		print_matrix(src, dst, matrix);
-	}
-
-	return matrix.back().back();
+size_t matrix(const std::string& src, const std::string& dst, bool verbose) {
+	return matrix_wrap<core::matrix>(src, dst, verbose);
 }
 
 }  // namespace levenshtein
