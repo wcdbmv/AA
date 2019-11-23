@@ -13,11 +13,11 @@ using product_func_type = matrix_t(const matrix_t&, const matrix_t&);
 product_func_type product;
 
 namespace bad {
-	product_func_type coppersmith_winograd_product;
+product_func_type coppersmith_winograd_product;
 }  // namespace bad
 
 namespace good {
-	product_func_type coppersmith_winograd_product;
+product_func_type coppersmith_winograd_product;
 }  // namespace good
 
 #endif  // LAB02_MATRIX_MATRIX_HPP_

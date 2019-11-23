@@ -1,38 +1,29 @@
 \chapter{Исследовательская часть}
 
+\section{Технические характеристики}
+
+\begin{itemize}
+	\item Операционная система: Ubuntu 19.10 64-bit.
+	\item Память: 3,8 GiB.
+	\item Процессор: Intel® Core™ i3-6006U CPU @ 2.00GHz
+\end{itemize}
+
 \section{Время выполнения алгоритмов}
 
-Алгоритмы тестировались c помощью функции замера процессорного времени \code{std::chrono::system\_clock::now()}
+Алгоритмы тестировались c помощью функции замера процессорного времени \code{std::chrono::high\_resolution\_clock::now()}
 
 Результаты замеров приведены в таблицах \ref{tbl:runtime_even} и \ref{tbl:runtime_odd}.
-На рисунках \ref{plt:runtime_even} и \ref{plt:runtime_odd} приведены графики зависимостей времени работы алгоритмов от размеров матриц.
+На рисунках \ref{plt:runtime_even} и \ref{plt:runtime_odd} приведены графики зависимостей времени работы алгоритмов от размеров матриц. Здесь и далее: СА — стандартный алгоритм, АКВ — алгоритм Копперсмита — Винограда, УАКВ — улучшенный алгоритм Копперсмита — Винограда.
 
-\begin{table}
+\begin{table}[h!]
 	\begin{center}
 		\begin{tabular}{|c|c|c|c|}
 			\hline
-			size&          product, s&    bad::winograd, s&   good::winograd, s\\
-			\hline
-			 100&          0.02166319&          0.02389638&          0.02059174\\
-			\hline
-			 200&          0.18450248&          0.18270885&          0.15404843\\
-			\hline
-			 300&          0.63138941&          0.63733165&          0.53161164\\
-			\hline
-			 400&          1.66205848&          1.64970626&          1.53359340\\
-			\hline
-			 500&          3.70691204&          3.30365819&          2.99382799\\
-			\hline
-			 600&          6.23411960&          5.99018235&          4.94188006\\
-			\hline
-			 700&          9.56781987&         10.11701787&          8.45501018\\
-			\hline
-			 800&         16.22708220&         15.35254552&         12.65185231\\
-			\hline
-			 900&         21.41687089&         22.79389402&         19.98731310\\
-			\hline
-			1000&         30.61349765&         31.34562136&         25.83768226\\
-			\hline
+			                         & \multicolumn{3}{c|}{\bfseries Время, мс}      \\ \cline{2-4}
+			\bfseries Размер матрицы & \bfseries СА & \bfseries АКВ & \bfseries УАКВ
+			\csvreader{inc/csv/runtime-even.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
 		\end{tabular}
 	\end{center}
 	\caption{Время работы алгоритмов при чётных размерах матриц}
@@ -43,28 +34,11 @@
 	\begin{center}
 		\begin{tabular}{|c|c|c|c|}
 			\hline
-			size&          product, s&    bad::winograd, s&   good::winograd, s\\
-			\hline
-			 101&          0.02429739&          0.02281909&          0.01864598\\
-			 \hline
-			 201&          0.20136341&          0.23196542&          0.19879223\\
-			 \hline
-			 301&          0.69179330&          0.64253922&          0.52794677\\
-			 \hline
-			 401&          1.99702617&          1.91006498&          1.43084805\\
-			 \hline
-			 501&          3.50368678&          3.78216654&          3.08489899\\
-			 \hline
-			 601&          6.17935569&          6.19524173&          5.18468571\\
-			 \hline
-			 701&          9.98678024&         10.20594483&          9.18677206\\
-			 \hline
-			 801&         15.62727239&         16.42991683&         14.35930371\\
-			 \hline
-			 901&         24.91668356&         22.95022987&         19.38116186\\
-			 \hline
-			1001&         31.90098081&         33.98675553&         28.93252437\\
-			\hline
+			                         & \multicolumn{3}{c|}{\bfseries Время, мс}      \\ \cline{2-4}
+			\bfseries Размер матрицы & \bfseries СА & \bfseries АКВ & \bfseries УАКВ
+			\csvreader{inc/csv/runtime-odd.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
 		\end{tabular}
 	\end{center}
 	\caption{Время работы алгоритмов при нечётных размерах матриц}
@@ -75,18 +49,16 @@
 	\centering
 	\begin{tikzpicture}
 		\begin{axis}[
-			axis lines = left,
-			xlabel = $size$,
-			ylabel = {$t,s$},
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
 			legend pos=north west,
 			ymajorgrids=true
 		]
-			\addplot[color=red] table[x index=0, y index=1] {inc/dat/runtime_even_product.dat};
-			\addplot[color=blue] table[x index=0, y index=1] {inc/dat/runtime_even_bad_winograd.dat};
-			\addplot[color=green] table[x index=0, y index=1] {inc/dat/runtime_even_good_winograd.dat};
-			\addlegendentry{product}
-			\addlegendentry{bad::winograd}
-			\addlegendentry{good::winograd}
+			\addplot table[x=size,y=product,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=bad_winograd,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=good_winograd,col sep=comma]{inc/csv/runtime-even.csv};
+			\legend{СА, АКВ, УАКВ}
 		\end{axis}
 	\end{tikzpicture}
 	\captionsetup{justification=centering}
@@ -98,18 +70,16 @@
 	\centering
 	\begin{tikzpicture}
 		\begin{axis}[
-			axis lines = left,
-			xlabel = $size$,
-			ylabel = {$t, s$},
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
 			legend pos=north west,
 			ymajorgrids=true
 		]
-			\addplot[color=red] table[x index=0, y index=1] {inc/dat/runtime_odd_product.dat};
-			\addplot[color=blue] table[x index=0, y index=1] {inc/dat/runtime_odd_bad_winograd.dat};
-			\addplot[color=green] table[x index=0, y index=1] {inc/dat/runtime_odd_good_winograd.dat};
-			\addlegendentry{product}
-			\addlegendentry{bad::winograd}
-			\addlegendentry{good::winograd}
+			\addplot table[x=size,y=product,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=bad_winograd,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=good_winograd,col sep=comma]{inc/csv/runtime-odd.csv};
+			\legend{СА, АКВ, УАКВ}
 		\end{axis}
 	\end{tikzpicture}
 	\captionsetup{justification=centering}
@@ -119,4 +89,4 @@
 
 \section*{Вывод}
 
-Время работы алгоритма Винограда незначительно меньше стандартного алгоритма умножения, однако оптимизированная реализации имеет заметный прирост в скорости работы, на метрацах размером 1000х1000 уже около 18\%.
+Время работы алгоритма Винограда незначительно меньше стандартного алгоритма умножения, однако оптимизированная реализации имеет заметный прирост в скорости работы, на матрицах размером 1000х1000 уже около 18\%.
