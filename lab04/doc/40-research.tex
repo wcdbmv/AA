@@ -1,0 +1,102 @@
+\chapter{Исследовательская часть}
+
+\section{Технические характеристики}
+
+\begin{itemize}
+	\item Операционная система: Ubuntu 19.10 64-bit.
+	\item Память: 3,8 GiB.
+	\item Процессор: Intel® Core™ i3-6006U CPU @ 2.00GHz c 2 физическими и 4 логическими ядрами
+\end{itemize}
+
+\section{Время выполнения алгоритмов}
+
+Алгоритмы тестировались c помощью функции замера процессорного времени \code{std::chrono::high\_resolution\_clock::now()}.
+Чтобы уменьшить случайные отклонения в измерениях, время считалось среднее для 5 запусков функций.
+
+Результаты замеров приведены в таблицах \ref{tbl:runtime_even} и \ref{tbl:runtime_odd}.
+На рисунках \ref{plt:runtime_even} и \ref{plt:runtime_odd} приведены графики зависимостей времени работы алгоритмов от размеров матриц на различном количестве потоков.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|c|c|}
+			\hline
+			                 & \multicolumn{7}{c|}{\bfseries Время при кол-ве потоков, мс}                                        \\ \cline{2-8}
+			\bfseries Размер & \bfseries 1 & \bfseries 2 & \bfseries 4 & \bfseries 8 & \bfseries 16 & \bfseries 32 & \bfseries 64
+			\csvreader{inc/csv/runtime-even.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi&\csvcolvii&\csvcolviii}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов при чётных размерах матриц}
+	\label{tbl:runtime_even}
+\end{table}
+
+\begin{table}
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|c|c|}
+			\hline
+			                 & \multicolumn{7}{c|}{\bfseries Время при кол-ве потоков, мс}                                        \\ \cline{2-8}
+			\bfseries Размер & \bfseries 1 & \bfseries 2 & \bfseries 4 & \bfseries 8 & \bfseries 16 & \bfseries 32 & \bfseries 64
+			\csvreader{inc/csv/runtime-odd.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv&\csvcolv&\csvcolvi&\csvcolvii&\csvcolviii}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов при нечётных размерах матриц}
+	\label{tbl:runtime_odd}
+\end{table}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=1.5]
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=thread1,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=thread2,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=thread4,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=thread8,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=thread16,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=thread32,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=thread64,col sep=comma]{inc/csv/runtime-even.csv};
+			\legend{1 поток, 2 потока, 4 потока, 8 потоков, 16 потоков, 32 потока, 64 потока}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма от размера квадратной матрицы (чётного)}
+	\label{plt:runtime_even}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[scale=1.5]
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=thread1,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=thread2,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=thread4,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=thread8,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=thread16,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=thread32,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=thread64,col sep=comma]{inc/csv/runtime-odd.csv};
+			\legend{1 поток, 2 потока, 4 потока, 8 потоков, 16 потоков, 32 потока, 64 потока}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма от размера квадратной матрицы (нечётного)}
+	\label{plt:runtime_odd}
+\end{figure}
+
+\section*{Вывод}
+
+Наилучшее время алгоритм показал на 4 потоках, соответствующих количеству логических ядер, уменьшив время однопоточной реализации в $2,3$ раза.
+Большее количество потоков в итоге немногим замедляет время необходимостью переключения контекста.

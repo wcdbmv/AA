@@ -1,0 +1,134 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены средства реализации и листинг кода.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран высокопроизводительный язык C++ \cite{cpp17}, так как он предоставляет широкие возможности для эффективной реализации алгоритмов.
+Для распараллеливания алгоритма используется \code{std::thread} из стандартной библиотеки.
+
+Для генерации псевдослучайных чисел использована функция из листинга \ref{lst:dont_try_to_guess}.
+
+Для замера времени работы алгоритма использованы точнейшие функции библиотеки \code{std::chrono}
+
+\section{Листинг кода}
+
+В листингах \ref{lst:single-winograd} и \ref{lst:multi-winograd} приведены однопоточная и многопоточная реализации алгоритмов Копперсмита — Винограда.
+Функция замера времени работы алгоритма приведена в листинге \ref{lst:count_time}.
+
+\begin{lstinputlisting}[
+	caption={Последовательный алгоритм Копперсмита — Винограда},
+	label={lst:single-winograd},
+	style={cpp},
+	linerange={5-67}
+]{../matrix/matrix.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Параллельный алгоритм Копперсмита — Винограда},
+	label={lst:multi-winograd},
+	style={cpp},
+	linerange={69-167}
+]{../matrix/matrix.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Продвинутый генератор псевдослучайных чисел},
+	label={lst:dont_try_to_guess},
+	style={cpp},
+	linerange={8-12}
+]{../performance_test.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Функция замера времени работы алгоритмов},
+	label={lst:count_time},
+	style={cpp},
+	linerange={26-36}
+]{../performance_test.cpp}
+\end{lstinputlisting}
+
+\section{Тестирование функций}
+
+В таблице~\ref{tabular:test_rec} приведены тесты для функций, реализующих однопоточный и многопоточный алгоритмы Копперсмита — Винограда. Тесты пройдены успешно.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}c@{\hspace{7mm}}}
+			\hline
+			Матрица 1 & Матрица 2 &Ожидаемый результат \\ \hline
+			\vspace{4mm}
+			$\begin{pmatrix}
+			1 & 2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			1 & 2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			6 & 12 & 18\\
+			6 & 12 & 18\\
+			6 & 12 & 18
+			\end{pmatrix}$ \\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			1 & 2\\
+			1 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			1 & 2\\
+			1 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			3 & 6\\
+			3 & 6
+			\end{pmatrix}$ \\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			4
+			\end{pmatrix}$ \\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			1 & -2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			-1 & 2 & 3\\
+			1 & 2 & 3\\
+			1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			0 & 4 & 6\\
+			4 & 12 & 18\\
+			4 & 12 & 18
+			\end{pmatrix}$\\
+			\vspace{2mm}
+			\vspace{2mm}
+			$\begin{pmatrix}
+			1 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+			1 & 2
+			\end{pmatrix}$ &
+			Не могут быть перемножены\\
+		\end{tabular}
+	\end{center}
+	\caption{\label{tabular:test_rec} Тестирование функций}
+\end{table}
+
+\section*{Вывод}
+
+Правильный выбор инструментов разработки позволил эффективно реализовать алгоритмы, настроить модульное тестирование и выполнить исследовательский раздел лабораторной работы.
