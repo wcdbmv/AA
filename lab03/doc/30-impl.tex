@@ -1,0 +1,81 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены средства реализации и листинг кода.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран высокопроизводительный язык C++ \cite{cpp17}, так как он предоставляет широкие возможности для эффективной реализации алгоритмов.
+
+Для генерации псевдослучайных чисел использована функция из листинга \ref{lst:dont_try_to_guess}.
+
+Для замера времени работы алгоритма использованы точнейшие функции библиотеки \code{std::chrono}.
+
+\section{Листинг кода}
+
+В листингах \ref{lst:bubble-sort}, \ref{lst:insertion-sort} и \ref{lst:selection-sort} приведены листинги алгоритма сортировки пузырьком, вставками и выбором соответственно.
+Функция замера времени работы алгоритма приведена в листинге \ref{lst:count_time}.
+
+\begin{lstinputlisting}[
+	caption={Алгоритм сортировки пузырьком},
+	label={lst:bubble-sort},
+	style={cpp},
+	linerange={9-18}
+]{../sort/sort.hpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Алгоритм сортировки вставками},
+	label={lst:insertion-sort},
+	style={cpp},
+	linerange={20-27}
+]{../sort/sort.hpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Алгоритм сортировки выбором},
+	label={lst:selection-sort},
+	style={cpp},
+	linerange={29-34}
+]{../sort/sort.hpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Продвинутый генератор псевдослучайных чисел},
+	label={lst:dont_try_to_guess},
+	style={cpp},
+	linerange={7-11}
+]{../performance_test.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Функция замера времени работы алгоритмов},
+	label={lst:count_time},
+	style={cpp},
+	linerange={39-54}
+]{../performance_test.cpp}
+\end{lstinputlisting}
+
+\section{Тестирование функций}
+
+В таблице~\ref{tbl:test} приведены тесты для функций, реализующих алгоритмы сортировки. Тесты пройдены успешно.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Входной массив & Результат & Ожидаемый результат \\ 
+			\hline
+			$[1,2,3,4]$ & $[1,2,3,4]$  & $[1,2,3,4]$\\
+			$[3,2,1]$  & $[1,2,3]$ & $[1,2,3]$\\
+			$[5,6,2,4,-2]$  & $[-2,2,4,5,6]$  & $[-2,2,4,5,6]$\\
+			$[4]$  & $[4]$  & $[4]$\\
+			$[]$  & $[]$  & $[]$\\
+			\hline
+		\end{tabular}
+		\caption{\label{tbl:test}Тестирование функций}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+Правильный выбор инструментов разработки позволил эффективно реализовать алгоритмы, настроить модульное тестирование и выполнить исследовательский раздел лабораторной работы.
