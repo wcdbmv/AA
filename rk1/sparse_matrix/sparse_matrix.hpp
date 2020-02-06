@@ -15,6 +15,8 @@ public:
 	void append(size_t row_index, size_t col_index, T element);
 	void sort() noexcept;
 	void RRCU(std::ostream& os);
+	void rccu();
+	void rccu_p(std::ostream& os) const;
 
 public:
 	template <typename T_>
@@ -39,9 +41,12 @@ private:
 	size_t reserved_;
 	size_t size_;
 
+	std::vector<size_t> row_pointers_;
 	std::vector<size_t> row_indices_;
 	std::vector<size_t> col_indices_;
 	std::vector<T> elements_;
+
+	bool r;
 
 private:
 	constexpr static size_t STD_RESERVE = 128;
@@ -56,9 +61,11 @@ SparseMatrix<T>::SparseMatrix(size_t height, size_t width, size_t reserve) noexc
 		width_(width),
 		reserved_(reserve),
 		size_(0),
+		row_pointers_(height + 1),
 		row_indices_(reserve),
 		col_indices_(reserve),
-		elements_(reserve) { }
+		elements_(reserve),
+		r(false) { }
 
 template <typename T>
 void SparseMatrix<T>::clear() noexcept {
@@ -66,9 +73,11 @@ void SparseMatrix<T>::clear() noexcept {
 	width_ = 0;
 	reserved_ = 0;
 	size_ = 0;
+	row_pointers_.clear();
 	row_indices_.clear();
 	col_indices_.clear();
 	elements_.clear();
+	r = false;
 }
 
 template <typename T>
@@ -78,9 +87,11 @@ void SparseMatrix<T>::resize(size_t height, size_t width, size_t reserve) {
 	reserved_ = reserve;
 	size_ = 0;
 
+	row_pointers_.resize(height + 1);
 	row_indices_.resize(reserve);
 	col_indices_.resize(reserve);
 	elements_.resize(reserve);
+	r = false;
 }
 
 template <typename T>
@@ -91,6 +102,7 @@ void SparseMatrix<T>::resize(size_t reserve) {
 	row_indices_.resize(reserve);
 	col_indices_.resize(reserve);
 	elements_.resize(reserve);
+	r = false;
 }
 
 template <typename T>
@@ -147,9 +159,11 @@ void SparseMatrix<T>::sort() noexcept {
 }
 
 template <typename T>
-void SparseMatrix<T>::RRCU(std::ostream& os) {
+void SparseMatrix<T>::rccu() {
 	// must be sorted
-	std::vector<size_t> ia(height_ + 1, 0);
+	for (auto&& rw: row_pointers_) {
+		rw = 0;
+	}
 
 	for (size_t k = 0; k < height_; ++k) {
 		int begin = -1;
@@ -167,20 +181,24 @@ void SparseMatrix<T>::RRCU(std::ostream& os) {
 		end = end == -1 ? static_cast<int>(size_) : end;
 		if (k == 0) {
 			if (begin == -1) {
-				ia[k] = 0;
-				ia[k + 1] = 0;
+				row_pointers_[k] = 0;
+				row_pointers_[k + 1] = 0;
 			} else {
-				ia[k] = static_cast<size_t>(begin);
-				ia[k + 1] = static_cast<size_t>(end);
+				row_pointers_[k] = static_cast<size_t>(begin);
+				row_pointers_[k + 1] = static_cast<size_t>(end);
 			}
 		} else {
-			ia[k + 1] = static_cast<size_t>(end);
+			row_pointers_[k + 1] = static_cast<size_t>(end);
 		}
 	}
-	ia[height_] = size_;
+	row_pointers_[height_] = size_;
+	r = true;
+}
 
+template <typename T>
+void SparseMatrix<T>::rccu_p(std::ostream& os) const {
 	os << height_<< ' ' << width_ << ' ' << size_ << '\n';
-	std::copy(ia.begin(), ia.end(), std::experimental::make_ostream_joiner(os, " "));
+	std::copy(row_pointers_.begin(), row_pointers_.end(), std::experimental::make_ostream_joiner(os, " "));
 	os << '\n';
 	std::copy(col_indices_.begin(), col_indices_.begin() + static_cast<long int>(size_), std::experimental::make_ostream_joiner(os, " "));
 	os << '\n';
@@ -189,10 +207,15 @@ void SparseMatrix<T>::RRCU(std::ostream& os) {
 }
 
 template <typename T>
+void SparseMatrix<T>::RRCU(std::ostream& os) {
+	rccu();
+	rccu_p(os);
+}
+
+template <typename T>
 SparseMatrix<T> operator+(const SparseMatrix<T>& lhs, const SparseMatrix<T>& rhs) {
 	return SparseMatrix<T>(0, 0, 0);
 }
-
 
 template <typename T>
 SparseMatrix<T> operator*(const SparseMatrix<T>& lhs, const SparseMatrix<T>& rhs) {
@@ -201,8 +224,59 @@ SparseMatrix<T> operator*(const SparseMatrix<T>& lhs, const SparseMatrix<T>& rhs
 	}
 
 	SparseMatrix<T> result(lhs.height_, rhs.width_, SparseMatrix<T>::calc_reserve(std::max(lhs.size_, rhs.size_)));
-	std::vector<bool> ix(lhs.height_, false);
 
+	size_t ip = 0;
+	for (size_t i = 0; i < lhs.height_; ++i) {
+		std::vector<bool> ix(lhs.height_, false);
+		result.row_pointers_[i] = ip;
+		const size_t iaa = lhs.row_pointers_[i];
+		const size_t iab = rhs.row_pointers_[i + 1];
+		for (size_t jp = iaa; jp < iab; ++jp) {
+			const size_t j = lhs.col_indices_[jp];
+			const size_t iba = rhs.row_pointers_[j];
+			const size_t ibb = rhs.row_pointers_[j + 1];
+			for (size_t kp = iba; kp < ibb; ++kp) {
+				const size_t k = rhs.col_indices_[kp];
+				if (ix[k]) {
+					continue;
+				}
+				result.col_indices_[ip] = k;
+				++ip;
+				ix[k] = true;
+			}
+		}
+	}
+	result.size_ = ip;
+	result.row_pointers_[result.height_] = ip;
+
+	std::vector<T> x(result.width_, 0);
+	for (size_t i = 0; i < lhs.height_; ++i) {
+		const size_t ica = result.row_pointers_[i];
+		const size_t icb = result.row_pointers_[i + 1];
+		for (size_t j = ica; j < icb; ++j) {
+			for (auto&& xx: x) xx = 0;
+			const size_t iaa = lhs.row_pointers_[i];
+			const size_t iab = lhs.row_pointers_[i + 1];
+			if (iab <= iaa) {
+				continue;
+			}
+			for (size_t jp = iaa; jp < iab; ++jp) {
+				j = lhs.col_indices_[jp];
+				T a = lhs.elements_[jp];
+				const size_t iba = rhs.row_pointers_[j];
+				const size_t ibb = rhs.row_pointers_[j + 1];
+				for (size_t kp = iba; kp < ibb; ++kp) {
+					size_t k = rhs.col_indices_[kp];
+					x[k] += a * rhs.elements_[kp];
+				}
+			}
+			for (j = ica; j < icb; ++j) {
+				result.elements_[j] = x[result.col_indices_[j]];
+			}
+		}
+	}
+
+	result.r = true;
 	return result;
 }
 
@@ -224,6 +298,11 @@ std::istream& operator>>(std::istream& is, SparseMatrix<T>& sm) {
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const SparseMatrix<T>& sm) {
+	if (sm.r) {
+		sm.rccu_p(os);
+		return os;
+	}
+
 	os << sm.height_ << ' ' << sm.width_ << ' ' << sm.size_ << '\n';
 	for (size_t i = 0; i < sm.size_; ++i) {
 		os << sm.row_indices_[i] << ' ' << sm.col_indices_[i] << ' ' << sm.elements_[i] << '\n';
