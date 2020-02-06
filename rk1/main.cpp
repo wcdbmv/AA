@@ -29,6 +29,7 @@ int main() {
 	std::cout << "c:\n" << c;
 	std::cout << "RRCU c:\n";
 	c.RRCU(std::cout);
+	std::cout << "a + b\n" << a + b;
 
 	SparseMatrix<int> d = a * b;
 	std::cout << "d:\n" << d;

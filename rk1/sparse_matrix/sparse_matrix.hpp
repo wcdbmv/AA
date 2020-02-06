@@ -214,7 +214,63 @@ void SparseMatrix<T>::RRCU(std::ostream& os) {
 
 template <typename T>
 SparseMatrix<T> operator+(const SparseMatrix<T>& lhs, const SparseMatrix<T>& rhs) {
-	return SparseMatrix<T>(0, 0, 0);
+	if (lhs.height_ != rhs.height_ || lhs.width_ != rhs.width_) {
+		throw std::invalid_argument("Invalid matrices' sizes");
+	}
+
+	SparseMatrix<T> result(lhs.height_, lhs.width_, SparseMatrix<T>::calc_reserve(lhs.size_ + rhs.size_));
+
+	size_t ip = 0;
+	for (size_t i = 0; i < lhs.height_; ++i) {
+		std::vector<bool> ix(lhs.height_, false);
+		result.row_pointers_[i] = ip;
+		const size_t iaa = lhs.row_pointers_[i];
+		const size_t iab = rhs.row_pointers_[i + 1];
+		for (size_t jp = iaa; jp < iab; ++jp) {
+			const size_t j = lhs.col_indices_[jp];
+			result.col_indices_[ip] = j;
+			++ip;
+			ix[j] = true;
+		}
+		const size_t iba = rhs.row_pointers_[i];
+		const size_t ibb = rhs.row_pointers_[i + 1];
+		for (size_t jp = iba; jp < ibb; ++jp) {
+			const size_t j = rhs.col_indices_[jp];
+			if (!ix[j]) {
+				result.col_indices_[ip] = j;
+				++ip;
+			}
+		}
+	}
+	result.size_ = ip;
+	result.row_pointers_[result.height_] = ip;
+
+	std::vector<T> x(result.width_, 0);
+	for (size_t i = 0; i < lhs.height_; ++i) {
+		const size_t ih = i + 1;
+		const size_t ica = result.row_pointers_[i];
+		const size_t icb = result.row_pointers_[ih];
+		//
+		for (size_t ipp = ica; ipp < icb; ++ipp) {
+			x[result.col_indices_[ipp]] = 0;
+		}
+		const size_t iaa = lhs.row_pointers_[i];
+		const size_t iab = lhs.row_pointers_[ih];
+		for (size_t ipp = iaa; ipp < iab; ++ipp) {
+			x[lhs.col_indices_[ipp]] = lhs.elements_[ipp];
+		}
+		const size_t iba = rhs.row_pointers_[i];
+		const size_t ibb = rhs.row_pointers_[ih];
+		for (size_t ipp = iba; ipp < ibb; ++ipp) {
+			x[rhs.col_indices_[ipp]] += rhs.elements_[ipp];
+		}
+		for (size_t ipp = ica; ipp < icb; ++ipp) {
+			result.elements_[ipp] = x[result.col_indices_[ipp]];
+		}
+	}
+
+	result.r = true;
+	return result;
 }
 
 template <typename T>
