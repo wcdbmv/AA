@@ -1,0 +1,92 @@
+\chapter{Исследовательская часть}
+
+\section{Технические характеристики}
+
+\begin{itemize}
+	\item Операционная система: Ubuntu 19.10 64-bit.
+	\item Память: 3,8 GiB.
+	\item Процессор: Intel® Core™ i3-6006U CPU @ 2.00GHz
+\end{itemize}
+
+\section{Время выполнения алгоритмов}
+
+Алгоритмы тестировались c помощью функции замера процессорного времени \code{std::chrono::high\_resolution\_clock::now()}
+
+Результаты замеров приведены в таблицах \ref{tbl:runtime_even} и \ref{tbl:runtime_odd}.
+На рисунках \ref{plt:runtime_even} и \ref{plt:runtime_odd} приведены графики зависимостей времени работы алгоритмов от размеров матриц. Здесь и далее: СА — стандартный алгоритм, АКВ — алгоритм Копперсмита — Винограда, УАКВ — улучшенный алгоритм Копперсмита — Винограда.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                         & \multicolumn{3}{c|}{\bfseries Время, мс}      \\ \cline{2-4}
+			\bfseries Размер матрицы & \bfseries СА & \bfseries АКВ & \bfseries УАКВ
+			\csvreader{inc/csv/runtime-even.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов при чётных размерах матриц}
+	\label{tbl:runtime_even}
+\end{table}
+
+\begin{table}
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                         & \multicolumn{3}{c|}{\bfseries Время, мс}      \\ \cline{2-4}
+			\bfseries Размер матрицы & \bfseries СА & \bfseries АКВ & \bfseries УАКВ
+			\csvreader{inc/csv/runtime-odd.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов при нечётных размерах матриц}
+	\label{tbl:runtime_odd}
+\end{table}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=product,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=bad_winograd,col sep=comma]{inc/csv/runtime-even.csv};
+			\addplot table[x=size,y=good_winograd,col sep=comma]{inc/csv/runtime-even.csv};
+			\legend{СА, АКВ, УАКВ}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма от размера квадратной матрицы (чётного)}
+	\label{plt:runtime_even}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=product,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=bad_winograd,col sep=comma]{inc/csv/runtime-odd.csv};
+			\addplot table[x=size,y=good_winograd,col sep=comma]{inc/csv/runtime-odd.csv};
+			\legend{СА, АКВ, УАКВ}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма от размера квадратной матрицы (нечётного)}
+	\label{plt:runtime_odd}
+\end{figure}
+
+\section*{Вывод}
+
+Время работы алгоритма Винограда незначительно меньше стандартного алгоритма умножения, однако оптимизированная реализации имеет заметный прирост в скорости работы, на матрицах размером 1000х1000 уже около 18\%.
