@@ -1,0 +1,20 @@
+YES 1. method.call_first_at_line();
+YES 1. std::call_first_at_line();
+YES 2. printf("%d", method.call_after_string());
+YES 2. printf("%d", std::call_after_string());
+YES 3. printf("\"%d", method.call_after_string_tricky());
+YES 3. printf("\"%d", std::call_after_string_tricky());
+YES 4. printf("\"%d", /* */ method.call_after_string_tricky_after_comment());
+YES 4. printf("\"%d", /* */ std::call_after_string_tricky_after_comment());
+YES 5. printf(/* */ "\"%d",  method.call_after_comment_after_string_tricky());
+YES 5. printf(/* */ "\"%d", std::call_after_comment_after_string_tricky());
+YES 6. /* " */ method.call_after_comment_tricky();
+YES 6. /* " */ std::call_after_comment_tricky();
+NO 1. // method.not_call_in_comment();
+NO 1. // std::not_call_in_comment();
+NO 2. printf(" method.not_call_in_string(); ");
+NO 2. printf(" std::not_call_in_string(); ");
+NO 3. printf(" \" method.not_call_in_string_tricky(); ");
+NO 3. printf(" \" std::not_call_in_string_tricky(); ");
+NO 4. /* method.not_call_in_string(); */
+NO 4. /* std::not_call_in_string(); */
