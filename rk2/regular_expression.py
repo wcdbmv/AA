@@ -14,7 +14,7 @@ def clean_line(line: str) -> str:
 
 
 def test_method(line: str) -> bool:
-    pattern = re.compile(r'\.\w+\(')
+    pattern = re.compile(r'\.[\w_]+\(')
     return bool(pattern.search(clean_line(line)))
 
 
