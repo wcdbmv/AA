@@ -1,0 +1,131 @@
+\chapter{Исследовательская часть}
+
+\section{Технические характеристики}
+
+\begin{itemize}
+	\item Операционная система: Ubuntu 19.10 64-bit.
+	\item Память: 3,8 GiB.
+	\item Процессор: Intel® Core™ i3-6006U CPU @ 2.00GHz
+\end{itemize}
+
+\section{Время выполнения алгоритмов}
+
+Алгоритмы тестировались c помощью функции замера процессорного времени \code{std::chrono::high\_resolution\_clock::now()}.
+Чтобы уменьшить случайные отклонения в измерениях, время считалось среднее для 5 запусков функций.
+
+Результаты замеров приведены в таблицах \ref{tbl:runtime-sorted}, \ref{tbl:runtime-reversed} и \ref{tbl:runtime-random}.
+На рисунках \ref{plt:runtime-sorted}, \ref{plt:runtime-reversed} и \ref{plt:runtime-random} приведены графики зависимостей времени работы алгоритмов сортировки от размеров массивов на отсортированных, обратно отсортированных и случайных данных.
+
+\section*{Вывод}
+
+Алгоритм сортировки вставками работает лучше остальных двух на случайных числах и уже отсортированных, практический интерес, конечно, представляет лишь первый случай,
+на котором сортировка вставками почти на четверть быстрее сортировки пузырьком и на тринадцатую часть быстрее сортировки выбором.
+
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                 & \multicolumn{3}{c|}{\bfseries Время сортировки, мс}           \\ \cline{2-4}
+			\bfseries Размер & \bfseries Пузырьком & \bfseries Вставками & \bfseries Выбором
+			\csvreader{inc/csv/runtime-sorted.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов сортировки на отсортированных данных}
+	\label{tbl:runtime-sorted}
+\end{table}
+
+\begin{figure}[h!]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=bubble,col sep=comma]{inc/csv/runtime-sorted.csv};
+			\addplot table[x=size,y=insertion,col sep=comma]{inc/csv/runtime-sorted.csv};
+			\addplot table[x=size,y=selection,col sep=comma]{inc/csv/runtime-sorted.csv};
+			\legend{Пузырьком, Вставками, Выбором}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма сортировки от размера отсортированного массива}
+	\label{plt:runtime-sorted}
+\end{figure}
+
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                 & \multicolumn{3}{c|}{\bfseries Время сортировки, мс}           \\ \cline{2-4}
+			\bfseries Размер & \bfseries Пузырьком & \bfseries Вставками & \bfseries Выбором
+			\csvreader{inc/csv/runtime-reversed.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов сортировки на обратно отсортированных данных}
+	\label{tbl:runtime-reversed}
+\end{table}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=bubble,col sep=comma]{inc/csv/runtime-reversed.csv};
+			\addplot table[x=size,y=insertion,col sep=comma]{inc/csv/runtime-reversed.csv};
+			\addplot table[x=size,y=selection,col sep=comma]{inc/csv/runtime-reversed.csv};
+			\legend{Пузырьком, Вставками, Выбором}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма сортировки от размера обратно отсортированного массива}
+	\label{plt:runtime-reversed}
+\end{figure}
+
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                 & \multicolumn{3}{c|}{\bfseries Время сортировки, мс}           \\ \cline{2-4}
+			\bfseries Размер & \bfseries Пузырьком & \bfseries Вставками & \bfseries Выбором
+			\csvreader{inc/csv/runtime-random.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Время работы алгоритмов сортировки на случайных данных}
+	\label{tbl:runtime-random}
+\end{table}
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Размер,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=size,y=bubble,col sep=comma]{inc/csv/runtime-random.csv};
+			\addplot table[x=size,y=insertion,col sep=comma]{inc/csv/runtime-random.csv};
+			\addplot table[x=size,y=selection,col sep=comma]{inc/csv/runtime-random.csv};
+			\legend{Пузырьком, Вставками, Выбором}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма сортировки от размера случайного массива}
+	\label{plt:runtime-random}
+\end{figure}
