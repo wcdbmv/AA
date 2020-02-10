@@ -1,0 +1,60 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены средства реализации и листинг кода.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран высокопроизводительный язык C++ \cite{cpp17}, так как он предоставляет широкие возможности для эффективной реализации алгоритмов.
+
+\section{Листинг кода}
+
+В листингах \ref{lst:standard}, \ref{lst:kmp} и \ref{lst:bm} приведены листинги алгоритма сортировки пузырьком, вставками и выбором соответственно.
+
+\begin{lstinputlisting}[
+	caption={Стандартный алгоритм},
+	label={lst:standard},
+	style={cpp},
+	linerange={6-26}
+]{../string/search.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Алгоритм Кнута — Морриса — Пратта},
+	label={lst:kmp},
+	style={cpp},
+	linerange={28-68}
+]{../string/search.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Алгоритм Бойера — Мура},
+	label={lst:bm},
+	style={cpp},
+	linerange={70-112}
+]{../string/search.cpp}
+\end{lstinputlisting}
+
+\section{Тестирование функций}
+
+В таблице~\ref{tbl:test} приведены тесты для функций, реализующих алгоритмы поиска подстроки в строке.
+Тесты пройдены успешно.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			\textbf{Строка1} & \textbf{Строка2} & \textbf{Ожидаемый результат} \\ \hline
+			aaaaa      & a  & 1  \\ \hline
+			aapo       & po & 2  \\ \hline
+			poaa       & po & 0  \\ \hline
+			qwerty     & a  & -1 \\ \hline
+			popopopopo & po & 0  \\ \hline
+		\end{tabular}
+		\caption{Тестирование функций}
+		\label{tbl:test}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+Правильный выбор инструментов разработки позволил эффективно реализовать алгоритмы, настроить модульное тестирование и выполнить исследовательский раздел лабораторной работы.

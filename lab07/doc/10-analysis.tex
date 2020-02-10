@@ -1,0 +1,122 @@
+\chapter{Аналитическая часть}
+
+\section{Описание задачи}
+
+Пусть даны строки \textit{source} и \textit{pattern}, обозначим их \textit{s} и \textit{p} соответственно.
+Необходимо проверить, входит ли строка \textit{p} в \textit{s}, если да, то найти индекс первого вхождения.
+
+\section{Описание алгоритмов}
+
+\subsection{Стандартный алгоритм}
+
+Стандартный алгоритм основан на последовательном сравнении всех подстрок строки \textit{s} с \textit{p}, т. е. будет происходить сравнение всех подстрок размера $|p|$, начиная с индексов $i = 1,2,...,|s|-|p|+1$.
+
+Пусть $s= "abcabccba"$, $p = "cab"$.
+В таблице \ref{tbl:standard-analysis} показаны сравнения символов, выполняемые в ходе работы алгоритма.
+
+\begin{table}[h]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+			\hline
+			№&a&b&c&a&b&c&c&b&a\\
+			\hline
+			1&c&a&b& & & & & &\\
+			\hline
+			2& &c&a&b& & & & &\\
+			\hline
+			3& & &c&a&b& & & &\\
+			\hline
+		\end{tabular}
+	\end{center}
+	\caption{Сравнение символов в стандартном алгоритме}
+	\label{tbl:standard-analysis}
+\end{table}
+
+\subsection{Алгоритм Кнута — Морриса — Пратта}
+
+Алгоритм Кнута — Морриса — Пратта является оптимизацией стандартного алгоритма \cite{Smyth}.
+Необходимо дать определения префикса, суффикса и префикс-функции.
+
+Алгоритм был разработан Д. Кнутом и В. Праттом и, независимо от них, Д. Моррисом \cite{Kormen}.
+Результаты своей работы они опубликовали совместно в 1977 году \cite{Knuth}.
+
+После частичного совпадения начальной части подстроки $patters$ с соответствующими символами строки $source$ мы фактически знаем пройденную часть строки и может «вычислить» некоторые сведения (на основе самой подстроки $pattern$), с помощью которых потом быстро продвинемся по тексту.
+
+Идея КМП-поиска — при каждом несовпадении двух символов текста и образа образ сдвигается на самое длинное совпадение начала с концом префикса (не учитывая тривиальное совпадение самого с собой) \cite{Okulov}.
+
+Рассмотрим пример. Создается массив сдвигов, таблица \ref{tbl:kmp-shift-analysis}.
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{|c|c|c|l|l|l|}
+			\hline
+			0 & 1 & 2 & 3 & 4 & 5 \\ \hline
+			a & b & c & a & b & d \\ \hline
+			0 & 0 & 0 & 1 & 2 & 0 \\ \hline
+		\end{tabular}
+	\end{center}
+	\caption{Массив сдвигов}
+	\label{tbl:kmp-shift-analysis}
+\end{table}
+
+В таблице \ref{tbl:kmp-example-analysis} представлена работа алгоритма.
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+			\hline
+			cтрока    & a & b & c & a & b & e                         & a & b & c & a                         & b                         & c                         & a                         & b                         & d                         \\ \hline
+			подстрока & a & b & c & a & b & \cellcolor[HTML]{FE0000}d &   &   &   &                           &                           &                           &                           &                           &                           \\ \hline
+			подстрока &   &   &   & a & b & \cellcolor[HTML]{FE0000}c & a & b & d &                           &                           &                           &                           &                           &                           \\ \hline
+			подстрока &   &   &   &   &   & \cellcolor[HTML]{FE0000}a & b & c & a & b                         & d                         &                           &                           &                           &                           \\ \hline
+			подстрока &   &   &   &   &   &                           & a & b & c & a                         & b                         & \cellcolor[HTML]{FE0000}d &                           &                           &                           \\ \hline
+			подстрока &   &   &   &   &   &                           &   &   &   & \cellcolor[HTML]{34FF34}a & \cellcolor[HTML]{34FF34}b & \cellcolor[HTML]{34FF34}c & \cellcolor[HTML]{34FF34}a & \cellcolor[HTML]{34FF34}b & \cellcolor[HTML]{34FF34}d \\ \hline
+		\end{tabular}
+		\caption{Пример работы алгоритма КМП}
+		\label{tbl:kmp-example-analysis}
+	\end{center}
+\end{table}
+
+\subsection{Алгоритм Бойера — Мура}
+
+Алгоритм поиска строки Бойера — Мура считается наиболее быстрым среди алгоритмов общего назначения, предназначенных для поиска подстроки в строке.
+Был разработан Бойером и Муром в 1977 году \cite{Boyer}.
+Преимущество этого алгоритма в том, что ценой некоторого количества предварительных вычислений над шаблоном (но не над строкой, в которой ведётся поиск) шаблон сравнивается с исходным текстом не во всех позициях — часть проверок пропускаются как заведомо не дающие результата.
+
+Основная идея алгоритм — начать поиск не с начала, а с конца подстроки.
+Наткнувшись на несовпадение, мы просто смещаем подстроку до самого правого вхождения данного символа, не учитывая последний.
+
+Рассмотрим пример. Создаётся массив прыжков, таблица \ref{tbl:bm-shift-analysis}.
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{|c|c|c|l|l|l|}
+			\hline
+			a & b & c & a & b & d \\ \hline
+			2 & 1 & 3 & 2 & 1 & 6 \\ \hline
+		\end{tabular}
+	\end{center}
+	\caption{Массив прыжков}
+	\label{tbl:bm-shift-analysis}
+\end{table}
+
+В таблице \ref{tbl:bm-example-analysis} представлена работа алгоритма.
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+			\hline
+			cтрока    & a & b & c & a & b & e                         & a & b & c & a                         & b                         & c                         & a                         & b                         & d                         \\ \hline
+			подстрока & a & b & c & a & b & \cellcolor[HTML]{FE0000}d &   &   &   &                           &                           &                           &                           &                           &                           \\ \hline
+			подстрока &   &   &   &   &   &                           & a & b & c & a                         & b                         & \cellcolor[HTML]{FE0000}d &                           &                           &                           \\ \hline
+			подстрока &   &   &   &   &   &                           &   &   &   & \cellcolor[HTML]{34FF34}a & \cellcolor[HTML]{34FF34}b & \cellcolor[HTML]{34FF34}c & \cellcolor[HTML]{34FF34}a & \cellcolor[HTML]{34FF34}b & \cellcolor[HTML]{34FF34}d \\ \hline
+		\end{tabular}
+	\end{center}
+	\caption{Пример работы алгоритма БМ}
+	\label{tbl:bm-example-analysis}
+\end{table}
+
+
+\section*{Вывод}
+
+В данной работе стоит задача реализации алгоритмов поиска подстроки в строке.
