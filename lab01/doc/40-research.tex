@@ -1,0 +1,128 @@
+\chapter{Исследовательская часть}
+
+\section{Пример работы}
+
+Демонстрация работы программы приведена на рисунках \ref{img:demo_levenshtein_matrix}---\ref{img:demo_levenshtein_damerau}.
+
+\boximg{59.5mm}{demo_levenshtein_matrix}{Демонстрация работы итеративного алгоритма Левенштейна}
+\boximg{19.95mm}{demo_levenshtein_recursive}{Демонстрация работы рекурсивного алгоритма Левенштейна}
+\boximg{58.2mm}{demo_levenshtein_damerau}{Демонстрация работы алгоритма Дамерау — Левенштейна}
+
+\section{Технические характеристики}
+
+\begin{itemize}
+	\item Операционная система: Ubuntu 19.10 64-bit.
+	\item Память: 3,8 GiB.
+	\item Процессор: Intel® Core™ i3-6006U CPU @ 2.00GHz
+\end{itemize}
+
+\section{Время выполнения алгоритмов}
+
+Алгоритмы тестировались c помощью функции замера процессорного времени \code{std::chrono::high\_resolution\_clock} при количестве повторов 100 для \hyperref[lst:levenshtein_matrix]{\code{matrix}}, \hyperref[lst:levenshtein_damerau_matrix]{\code{damerau\_matrix}}, и \hyperref[lst:levenshtein_damerau_recursive]{\code{damerau\_recursive}};
+
+Результаты замеров приведены в таблицах \ref{tbl:performance-test0001-0010} и \ref{tbl:performance-test0010-1000}.
+На рисунках \ref{plt:performance-damerau} и \ref{plt:performance-matrix} приведены графики зависимостей времени работы алгоритмов от длины строк.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                      & \multicolumn{3}{c|}{\bfseries Время, мс}                                    \\ \cline{2-4}
+			\bfseries Длина строк & \bfseries matrix & \bfseries damerau\_matrix & \bfseries damerau\_recursive
+			\csvreader{inc/csv/performance-test0001-0010.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Замер времени для строк, размером до 10}
+	\label{tbl:performance-test0001-0010}
+\end{table}
+
+\begin{table}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			                      & \multicolumn{2}{c|}{\bfseries Время, мс}     \\ \cline{2-3}
+			\bfseries Длина строк & \bfseries matrix & \bfseries damerau\_matrix
+			\csvreader{inc/csv/performance-test0010-1000.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii}
+			\\\hline
+		\end{tabular}
+	\end{center}
+	\caption{Замер времени для строк, размером до 1000}
+	\label{tbl:performance-test0010-1000}
+\end{table}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Длина строк,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=len,y=damerau_matrix,col sep=comma] {inc/csv/performance-test0001-0010.csv};
+			\addplot table[x=len,y=damerau_recursive,col sep=comma] {inc/csv/performance-test0001-0010.csv};
+			\legend{Матричный, Рекурсивный}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы алгоритма вычисления расстояния Дамерау — Левенштейна от длины строк (матричная и рекурсивная реализации)}
+	\label{plt:performance-damerau}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\begin{axis}[
+			axis lines=left,
+			xlabel=Длина строк,
+			ylabel={Время, мс},
+			legend pos=north west,
+			ymajorgrids=true
+		]
+			\addplot table[x=len,y=matrix,col sep=comma] {inc/csv/performance-test0100-1000.csv};
+			\addplot table[x=len,y=damerau_matrix,col sep=comma] {inc/csv/performance-test0100-1000.csv};
+			\legend{Левенштейн, Д. — Левенштейн}
+		\end{axis}
+	\end{tikzpicture}
+	\captionsetup{justification=centering}
+	\caption{Зависимость времени работы матричных реализаций алгоритмов Левенштейна и Дамерау — Левенштейна}
+	\label{plt:performance-matrix}
+\end{figure}
+
+\section{Использование памяти}
+
+Алгоритмы Левенштейна и Дамерау — Левенштейна не отличаются друг от друга с точки зрения использования памяти, следовательно, достаточно рассмотреть лишь разницу рекурсивной и матричной реализаций этих алгоритмов.
+
+Максимальная глубина стека вызовов при рекурсивной реализации равна сумме длин входящих строк, соответственно, максимальный расход памяти (\ref{for:99})
+\begin{equation}
+(\mathcal{S}(src) + \mathcal{S}(dst)) \cdot (2 \cdot \mathcal{S}\mathrm{(std\!::\!string\&)} + 4 \cdot \mathcal{S}\mathrm{(size\_t)}),
+\label{for:99}
+\end{equation}
+где $\mathcal{S}$ — оператор вычисления размера, $src$, $dst$ — строки, $\mathrm{size\_t}$ — целочисленный тип, $\mathrm{std\!::\!string\&}$ — тип указателя на строку.
+
+Использование памяти при итеративной реализации теоретически равно
+\begin{equation}
+\mathcal{S}(src) \cdot \mathcal{S}(dst) \cdot \mathcal{S}\mathrm{(size\_t)} + 2\cdot(\mathcal{S}\mathrm{(std\!::\!string\&)} + \mathcal{S}\mathrm{(size\_t)}).
+\end{equation}
+
+Например, при вычислении расстояния Левеншейна для строк длиной 10, при размере типов $\mathrm{size\_t}$ и $\mathrm{std\!::\!string\&}$ 8 байтов получим:
+\begin{itemize}
+	\item для рекурсивной реализации $(10 + 10) \cdot (2\cdot8 + 4\cdot8) = 960$ байтов;
+	\item для матричной реализации $10 \cdot 10 \cdot 8 + 2\cdot(8 + 8) = 832$ байта.
+\end{itemize}
+
+Можно заметить, что для корректной работы алгоритмов матрицу можно не хранить целиком, а использовать только текущую и предыдущую строки. При этом, если менять местами $src$ и $dst$ в случае $\mathcal{S}(src) > \mathcal{S}(dst)$, то тогда расход памяти составит
+\begin{equation}
+(2\min(\mathcal{S}(src), \mathcal{S}(dst)) + 1) \cdot \mathcal{S}\mathrm{(size\_t)} + 2\cdot\mathcal{S}\mathrm{(std\!::\!string\&)}.
+\end{equation}
+В примере выше для строк длиной 10: $(2(10 + 1)\cdot8 + 2\cdot8) = 192$ байта.
+
+\section*{Вывод}
+
+Рекурсивный алгоритм Левенштейна работает на порядок дольше итеративных реализаций, время его работы увеличивается в геометрической прогрессии. Алгоритм Дамерау — Левенштейна работает немногим дольше алгоритма Левенштейна, т. к. в нём добавлены дополнительные проверки.
+
+Но по расходу памяти итеративные алгоритмы проигрывают рекурсивному: максимальный размер используемой памяти в них растёт как произведение длин строк, в то время как у рекурсивного алгоритма — как сумма длин строк. Однако в итеративных алгоритмах можно добиться ещё меньшего порядка роста, равному минимуму из длин строк, если не использовать всю матрицу целиком.

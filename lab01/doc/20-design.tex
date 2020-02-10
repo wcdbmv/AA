@@ -1,0 +1,35 @@
+\chapter{Конструкторская часть}
+
+\section{Схема алгоритма Левенштейна}
+
+На рисунке \ref{img:levenshtein_matrix} приведена схема матричного алгоритма Левенштейна.
+
+\section{Схема алгоритма Дамерау — Левенштейна}
+
+На рисунках \ref{img:levenshtein_damerau_matrix} и \ref{img:levenshtein_damerau_recursive} представлены матричный и рекурсивный алгоритмы Дамерау — Левенштейна.
+
+\section*{Вывод}
+
+На основе теоретических данных, полученных из аналитического раздела были построены схемы требуемых алгоритмов.
+
+% don't look at me
+
+% alright
+
+\img{95mm}{levenshtein_detail_set_current_min_distance}{Схема процедуры, вычисляющей текущее расстояние}
+
+\img{250mm}{levenshtein_matrix}{Схема матричного алгоритма Левенштейна}
+
+\img{105mm}{levenshtein_detail_initial_matrix}{Схема функции, создающей матрицу с инициализированными первой строкой и первым столбцом}
+
+\img{115mm}{levenshtein_detail_init_second_layer}{Схема процедуры, инициализирующей вторую строку и второй столбец}
+
+
+\begin{figure}[h]
+	\center{\includegraphics[height=60mm]{inc/img/levenshtein_damerau_recursive}}
+	\center{\includegraphics[height=190mm]{inc/img/levenshtein_detail_damerau_recursive}}
+	\caption{Схема рекурсивного алгоритма Дамерау — Левенштейна}
+	\label{img:levenshtein_damerau_recursive}
+\end{figure}
+
+\img{250mm}{levenshtein_damerau_matrix}{Схема матричного алгоритма Дамерау — Левенштейна}

@@ -1,0 +1,85 @@
+\chapter{Технологическая часть}
+
+В данном разделе приведены требования к программному обеспечению, средства реализации и листинги кода.
+
+\section{Требования к ПО}
+
+К программе предъявляется ряд требований:
+\begin{itemize}
+	\item на вход подаётся тип алгоритма (\code{[damerau\_]<matrix|recursive>}) и две строки;
+	\item на выходе — искомое расстояние (для \code{matrix} — Левенштейна , для \code{damerau\_matrix}  или \code{damerau\_recursive} — Дамерау — Левенштейна);
+	\item при указании ключа \code{-v|{-}-verbose} в матричных алгоритмах необходимо вывести матрицу;
+	\item программа не должна аварийно завершаться при некорректном вводе пользователя.
+\end{itemize}
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран высокопроизводительный язык C++ \cite{cpp17}, предоставляющий широкие возможности для эффективной реализации алгоритмов.
+
+\section{Листинг кода}
+
+В листингах \ref{lst:levenshtein_core_detail_matrix}--\ref{lst:levenshtein_core_damerau_recursive} приведены реализации алгоритмов Левенштейна и Дамерау — Левенштейна.
+
+\begin{lstinputlisting}[
+	caption={Вспомогательные функции для матричных алгоритмов},
+	label={lst:levenshtein_core_detail_matrix},
+	style={cpp},
+	linerange={6-44}
+]{../levenshtein/core/levenshtein_core_detail_matrix.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Функция, реализующая матричный алгоритм Левенштейна},
+	label={lst:levenshtein_core_matrix},
+	style={cpp},
+	linerange={5-23}
+]{../levenshtein/core/levenshtein_core_matrix.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Функция, реализующая матричный алгоритм Дамерау — Левенштейна},
+	label={lst:levenshtein_core_damerau_matrix},
+	style={cpp},
+	linerange={5-30}
+]{../levenshtein/core/levenshtein_core_damerau_matrix.cpp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Функция, реализующая рекурсивный алгоритм Дамерау — Левенштейна},
+	label={lst:levenshtein_core_damerau_recursive},
+	style={cpp},
+	linerange={5-30}
+]{../levenshtein/core/levenshtein_core_damerau_recursive.cpp}
+\end{lstinputlisting}
+
+
+В листинге \ref{lst:time} приведена реализация функции замера времени работы алгоритмов
+
+\begin{lstinputlisting}[
+	caption={Функция замера времени работы алгоритмов в тиках},
+	label={lst:time},
+	style={cpp},
+	linerange={38-53}
+]{../performance_test.cpp}
+\end{lstinputlisting}
+
+В таблице \ref{tabular:functional_test} приведен функциональные тесты для алгоритмов вычисления расстояния Левенштейна и Дамерау — Левенштейна. Все тесты пройдены успешно.
+
+\begin{table}
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			                    &                    & \multicolumn{2}{c|}{\bfseries Ожидаемый результат}    \\ \cline{3-4}
+			\bfseries Строка 1  & \bfseries Строка 2 & \bfseries Левенштейн & \bfseries Дамерау — Левенштейн
+			\csvreader{inc/csv/functional-test.csv}{}
+			{\\\hline \csvcoli&\csvcolii&\csvcoliii&\csvcoliv}
+			\\\hline
+		\end{tabular}
+		\caption{\label{tabular:functional_test} Функциональные тесты}
+	\end{center}
+\end{table}
+
+
+\section*{Вывод}
+
+Были разработаны и протестированы схемы трех алгоритмов: вычисления расстояния Левенштейна матрицей, вычисления расстояния Дамерау — Левенштейна матрицей и рекурсивно.
